@@ -1,0 +1,76 @@
+<template>
+    <template if:true={errors}>
+        <p>{errors}</p>
+    </template>
+    <lightning-card>
+        
+        <div class="slds-grid slds-grid_align-spread">
+            <div class="slds-col slds-p-around_x-small">
+                <!--Button Icon Popover-->
+                <c-avonni-button-icon-popover
+                    variant="border-filled"
+                    icon-name="utility:favorite"
+                    tooltip="Tooltip text"
+                    popover-size="large"
+                    popover-variant="walkthrough">
+                        <p slot="title" class="slds-text-heading_small">Button Icon Popover Title</p>
+                        <p>Button Icon Popover Content
+                            <a href="https://www.avonnicomponents.com/components/button-icon-popover/" target="_blank" title="Learn More"> Learn More </a>
+                        </p>
+                        <p slot="footer">Footer</p>
+                </c-avonni-button-icon-popover>
+                
+            </div>
+            <div class="slds-col slds-p-around_x-small">
+                
+                <c-avonni-metric
+                avatar={avatar}
+                label="Total Accounts"
+                secondary-trend-icon="dynamic"
+                secondary-show-trend-color
+                secondary-value={getAccountsCreatedLastYear.data}
+                value={getAccountsCount.data}
+            ></c-avonni-metric>
+            </div>
+            <div class="slds-col slds-p-around_x-small">
+                <!--Button Icon Dialog-->
+                <c-avonni-button-icon-dialog
+                
+                id="icondialog"
+                tooltip="Show modal"
+                icon-name="utility:einstein"
+                variant="brand"
+                onclick={handleClick}
+                >
+                    <template lwc:if={showModal}>
+                        <c-avonni-dialog dialog-name="dialog" id="modal">
+                            <h2 slot="title" class="slds-modal__title slds-hyphenate">
+                                Button icon dialog Header (Slot Title)
+                            </h2>
+                            <div>
+                                Dialog content <a href="https://www.avonnicomponents.com/components/button-icon-dialog/" target="_blank" title="Learn More">Learn more</a>
+                            </div>
+                            <div slot="footer">
+                                <lightning-button label="Close" variant="brand" class="slds-p-left_x-small" onclick={handleClose} >
+                                </lightning-button>
+                            </div>
+                        </c-avonni-dialog>
+                    </template>
+                </c-avonni-button-icon-dialog>
+            </div>
+          </div>
+        <template if:true={accounts.data}>
+            <c-avonni-datatable
+                columns={columns}
+                records={accounts.data}
+                key-field="id"
+                column-widths-mode="auto"
+                draft-values={draftValues}
+                errors={errors}
+                enable-infinite-loading
+                hide-checkbox-column
+                >
+            </c-avonni-datatable>
+        </template>
+    </lightning-card>
+</template>

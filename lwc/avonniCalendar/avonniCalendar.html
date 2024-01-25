@@ -1,0 +1,249 @@
+<!--
+/**
+ * BSD 3-Clause License
+ *
+ * Copyright (c) 2021, Avonni Labs, Inc.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * - Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * - Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+-->
+
+<template>
+    <template lwc:if={readyToShow}>
+
+    
+    <div
+        class="avonni-calendar__container"
+        onblur={handleBlur}
+        onfocusin={handleFocus}
+        tabindex="-1"
+        onkeydown={handleKeyDown}
+        data-element-id="avonni-calendar__container"
+    >
+        <div
+            class="slds-form-element avonni-calendar__background_color"
+            data-element-id="avonni-calendar__keyboard-handler"
+        >
+            <div class="slds-datepicker">
+                <template if:false={hideNavigation}>
+                    <div
+                        class="slds-datepicker__filter slds-grid"
+                        data-element-id="avonni-calendar__header"
+                    >
+                        <div
+                            class="
+                                slds-datepicker__filter_month
+                                slds-grid slds-grid_align-spread
+                                slds-grow
+                            "
+                        >
+                            <div class="slds-align-middle">
+                                <lightning-button-icon
+                                    icon-name="utility:left"
+                                    variant="container"
+                                    alternative-text="Previous Month"
+                                    title="Previous Month"
+                                    onclick={handlerPreviousMonth}
+                                    disabled={disabledPrevious}
+                                    data-element-id="previous-lightning-button-icon"
+                                ></lightning-button-icon>
+                            </div>
+                            <h2
+                                class="
+                                    slds-align-middle
+                                    avonni-calendar__month_color
+                                "
+                                data-element-id="h2"
+                            >
+                                {month}
+                            </h2>
+                            <div class="slds-align-middle">
+                                <lightning-button-icon
+                                    icon-name="utility:right"
+                                    variant="container"
+                                    alternative-text="Next Month"
+                                    title="Next Month"
+                                    disabled={disabledNext}
+                                    data-element-id="next-lightning-button-icon"
+                                    onclick={handlerNextMonth}
+                                ></lightning-button-icon>
+                            </div>
+                        </div>
+                        <c-avonni-combobox
+                            class="avonni-calendar__year-combobox"
+                            hide-clear-icon
+                            name="years"
+                            label="Years"
+                            variant="label-hidden"
+                            dropdown-alignment="right"
+                            value={year}
+                            placeholder={year}
+                            options={yearsList}
+                            disabled={disabled}
+                            data-element-id="avonni-combobox"
+                            onchange={handleYearChange}
+                        >
+                        </c-avonni-combobox>
+                    </div>
+                </template>
+                <table
+                    aria-labelledby="month"
+                    aria-multiselectable={isMultiSelect}
+                    class={tableClasses}
+                    role="grid"
+                >
+                    <thead>
+                        <tr id="weekdays">
+                            <template
+                                for:each={days}
+                                for:item="day"
+                                for:index="index"
+                            >
+                                <th
+                                    key={day}
+                                    id={index}
+                                    scope="col"
+                                    class="avonni-calendar__weekdays_color"
+                                >
+                                    <abbr>{day}</abbr>
+                                </th>
+                            </template>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={calendarData} for:item="week">
+                            <tr
+                                class="avonni-calendar__table-row"
+                                key={generateKey}
+                            >
+                                <template for:each={week} for:item="day">
+                                    <td
+                                        class={day.wrapperClass}
+                                        key={generateKey}
+                                        aria-selected={day.selected}
+                                        aria-current={day.ariaCurrent}
+                                        role="gridcell"
+                                        tabindex={day.tabIndex}
+                                        data-date={day.label}
+                                        data-disabled={day.disabled}
+                                        data-element-id="td"
+                                        data-full-date={day.date.ts}
+                                        data-selected={day.appearsSelected}
+                                        data-today={day.isToday}
+                                        onmouseover={handleMouseOver}
+                                        onmouseout={handleMouseOut}
+                                        onfocus={handleDateFocus}
+                                    >
+                                        <span
+                                            class={day.labelClass}
+                                            data-full-date={day.date.ts}
+                                            data-date={day.label}
+                                            data-disabled={day.disabled}
+                                            data-element-id="span-day-label"
+                                            onclick={handleSelectDate}
+                                            >{day.label}</span
+                                        >
+                                        <div
+                                            if:true={day.markers.length}
+                                            class="slds-is-relative"
+                                        >
+                                            <div
+                                                class="
+                                                    avonni-calendar__marker-container
+                                                "
+                                            >
+                                                <template
+                                                    for:each={day.markers}
+                                                    for:item="marker"
+                                                >
+                                                    <div
+                                                        key={generateKey}
+                                                        class="
+                                                            avonni-calendar__marked-cells
+                                                        "
+                                                        data-element-id="div-marked-cells"
+                                                        style={marker}
+                                                    ></div>
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <c-avonni-chip
+                                            if:true={day.hasChip}
+                                            class={day.chip.computedClass}
+                                            label={day.chip.label}
+                                            variant={day.chip.variant}
+                                            outline={day.chip.outline}
+                                            data-full-date={day.date.ts}
+                                            data-element-id="chip-date-label"
+                                        >
+                                            <c-avonni-primitive-icon
+                                                if:true={day.chip.showLeftIcon}
+                                                class="
+                                                    avonni-calendar-chip-icon-left
+                                                "
+                                                slot="left"
+                                                size="xx-small"
+                                                variant={day.chip.iconVariant}
+                                                icon-name={day.chip.iconName}
+                                                data-full-date={day.date.ts}
+                                            ></c-avonni-primitive-icon>
+                                            <c-avonni-primitive-icon
+                                                if:true={day.chip.showRightIcon}
+                                                class="
+                                                    avonni-calendar-chip-icon-right
+                                                "
+                                                slot="right"
+                                                size="xx-small"
+                                                variant={day.chip.iconVariant}
+                                                icon-name={day.chip.iconName}
+                                                data-full-date={day.date.ts}
+                                            ></c-avonni-primitive-icon>
+                                        </c-avonni-chip>
+                                    </td>
+                                </template>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+   
+    </template>
+    <template lwc:if={hasChanged}>
+        <div class="avonni-calendar__container slds-align_absolute-center">
+            <lightning-button variant="brand" label="Save" class="slds-m-left_x-small" onclick={handleSave}>
+            </lightning-button>
+            <lightning-button variant="brand-outline" label="Cancel" class="slds-m-left_x-small" onclick={handleCancel}>
+            </lightning-button>
+            <div  if:true={showSpinner}>
+                <lightning-spinner alternative-text="Loading" variant="brand"></lightning-spinner>
+            </div>
+        </div>
+    </template>
+    
+</template>
